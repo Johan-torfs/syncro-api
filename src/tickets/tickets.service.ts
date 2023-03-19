@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { UpdateResult } from 'typeorm';
 import { Repository } from 'typeorm/repository/Repository';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
@@ -9,23 +10,23 @@ import { Ticket } from './entities/ticket.entity';
 export class TicketsService {
   constructor(@InjectRepository(Ticket) private ticketRepository: Repository<Ticket>) {}
 
-  create(createTicketDto: CreateTicketDto) {
-    return 'This action adds a new ticket';
+  create(createTicketDto: CreateTicketDto): Promise<Ticket> {
+    return this.ticketRepository.save(createTicketDto);
   }
 
-  findAll() {
+  findAll(): Promise<Ticket[]> {
     return this.ticketRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} ticket`;
+  findOne(id: number): Promise<Ticket> {
+    return this.ticketRepository.findOneBy({ id });
   }
 
-  update(id: number, updateTicketDto: UpdateTicketDto) {
-    return `This action updates a #${id} ticket`;
+  update(id: number, updateTicketDto: UpdateTicketDto): Promise<UpdateResult> {
+    return this.ticketRepository.update(id, updateTicketDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} ticket`;
+  async remove(id: number): Promise<void> {
+    await this.ticketRepository.delete(id);
   }
 }

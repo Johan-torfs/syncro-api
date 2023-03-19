@@ -1,26 +1,31 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 import { CreateAssetDto } from './dto/create-asset.dto';
 import { UpdateAssetDto } from './dto/update-asset.dto';
+import { Asset } from './entities/asset.entity';
 
 @Injectable()
 export class AssetsService {
-  create(createAssetDto: CreateAssetDto) {
-    return 'This action adds a new asset';
+  constructor(@InjectRepository(Asset) private assetRepository: Repository<Asset> ) {}
+
+  create(createAssetDto: CreateAssetDto): Promise<Asset> {
+    return this.assetRepository.save(createAssetDto);
   }
 
-  findAll() {
-    return `This action returns all assets`;
+  findAll(): Promise<Asset[]> {
+    return this.assetRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} asset`;
+  findOne(id: number): Promise<Asset> {
+    return this.assetRepository.findOneBy({ id });
   }
 
-  update(id: number, updateAssetDto: UpdateAssetDto) {
-    return `This action updates a #${id} asset`;
+  update(id: number, updateAssetDto: UpdateAssetDto): Promise<UpdateResult> {
+    return this.assetRepository.update(id, updateAssetDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} asset`;
+  async remove(id: number): Promise<void> {
+    await this.assetRepository.delete(id);
   }
 }
