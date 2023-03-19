@@ -1,1 +1,4 @@
-export class CreatePriorityDto {}
+export class CreatePriorityDto {
+    name: string;
+    color: string;
+}
