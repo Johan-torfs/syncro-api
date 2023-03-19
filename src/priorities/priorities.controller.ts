@@ -1,8 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { PrioritiesService } from './priorities.service';
 import { CreatePriorityDto } from './dto/create-priority.dto';
 import { UpdatePriorityDto } from './dto/update-priority.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 
+@ApiBearerAuth('defaultBearerAuth')
+@UseGuards(AuthGuard('jwt'))
 @Controller('priorities')
 export class PrioritiesController {
   constructor(private readonly prioritiesService: PrioritiesService) {}
