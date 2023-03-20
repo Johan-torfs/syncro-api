@@ -1,11 +1,13 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { RolesGuard } from 'src/roles/roles.guard';
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 
 @ApiBearerAuth('defaultBearerAuth')
+@UseGuards(RolesGuard)
 @UseGuards(AuthGuard('jwt'))
 @Controller('comments')
 export class CommentsController {

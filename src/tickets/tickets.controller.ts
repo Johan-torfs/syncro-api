@@ -4,8 +4,10 @@ import { CreateTicketDto } from './dto/create-ticket.dto';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from 'src/roles/roles.guard';
 
 @ApiBearerAuth('defaultBearerAuth')
+@UseGuards(RolesGuard)
 @UseGuards(AuthGuard('jwt'))
 @Controller('tickets')
 export class TicketsController {

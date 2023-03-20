@@ -4,8 +4,10 @@ import { CreatePriorityDto } from './dto/create-priority.dto';
 import { UpdatePriorityDto } from './dto/update-priority.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from 'src/roles/roles.guard';
 
 @ApiBearerAuth('defaultBearerAuth')
+@UseGuards(RolesGuard)
 @UseGuards(AuthGuard('jwt'))
 @Controller('priorities')
 export class PrioritiesController {

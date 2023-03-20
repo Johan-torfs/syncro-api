@@ -40,4 +40,19 @@ export class UsersService {
       email: userLoginDto.email
     });
   }
+
+  async matchRoles(roles: string[], userId: number): Promise<boolean> {
+    const user = await this.userRepository.findOne({ 
+      where: { id: userId },
+      relations: ["role"] 
+    });
+    
+    if (!user || !user.role) return false;
+    
+    for (const role of roles) {
+      if (role === user.role.name) return true;
+    };
+
+    return false;
+  }
 }

@@ -4,8 +4,11 @@ import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from './roles.guard';
+import { Roles } from './roles.decorator';
 
 @ApiBearerAuth('defaultBearerAuth')
+@UseGuards(RolesGuard)
 @UseGuards(AuthGuard('jwt'))
 @Controller('roles')
 export class RolesController {
@@ -17,6 +20,7 @@ export class RolesController {
   }
 
   @Get()
+  @Roles('admin')
   findAll() {
     return this.rolesService.findAll();
   }
