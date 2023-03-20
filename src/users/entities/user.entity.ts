@@ -8,10 +8,10 @@ export class User {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @Column({ nullable: true })
     firstname: string;
 
-    @Column()
+    @Column({ nullable: true })
     lastname: string;
 
     @Column()
@@ -20,19 +20,19 @@ export class User {
     @Column()
     password: string;
 
-    @Column()
+    @Column({ nullable: true })
     phone: string;
 
-    @Column()
+    @Column({ nullable: true })
     address: string;
 
-    @Column()
+    @Column({ nullable: true })
     city: string;
 
-    @Column()
+    @Column({ nullable: true })
     state: string;
 
-    @Column()
+    @Column({ nullable: true })
     zip: string;
 
     @ManyToOne(type => Role, role => role.users)
