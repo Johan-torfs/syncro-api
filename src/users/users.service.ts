@@ -36,8 +36,9 @@ export class UsersService {
   }
 
   async findOneValidate(userLoginDto: UserLoginDto): Promise<User> {
-    return this.userRepository.findOneBy({
-      email: userLoginDto.email
+    return this.userRepository.findOne({ 
+      where: { email: userLoginDto.email },
+      relations: ["role"] 
     });
   }
 
