@@ -21,6 +21,10 @@ export class RolesService {
     return this.roleRepository.findOneBy({ id });
   }
 
+  findOneByName(name: string): Promise<Role> {
+    return this.roleRepository.findOne({ where: { name: name } });
+  }
+
   update(id: number, updateRoleDto: UpdateRoleDto): Promise<UpdateResult> {
     return this.roleRepository.update(id, updateRoleDto);
   }

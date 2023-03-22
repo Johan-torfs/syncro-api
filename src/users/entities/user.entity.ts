@@ -38,13 +38,13 @@ export class User {
     @ManyToOne(type => Role, role => role.users)
     role: Role;
 
-    @OneToMany(type => Asset, asset => asset.customer)
+    @OneToMany(type => Asset, asset => asset.customer, { onDelete: 'SET NULL' })
     assets: Asset[];
 
-    @OneToMany(type => Ticket, ticket => ticket.customer)
+    @OneToMany(type => Ticket, ticket => ticket.customer, { onDelete: 'SET NULL' })
     tickets: Ticket[];
 
-    @OneToMany(type => Ticket, ticket => ticket.technician)
+    @OneToMany(type => Ticket, ticket => ticket.technician, { onDelete: 'SET NULL' })
     assigned_tickets: Ticket[];
 
     @CreateDateColumn()

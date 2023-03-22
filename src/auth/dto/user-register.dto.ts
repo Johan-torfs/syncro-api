@@ -5,5 +5,5 @@ export class UserRegisterDto {
     lastname?: string;
     email: string;
     password: string;
-    role?: Role;
+    roleId?: number;
 }

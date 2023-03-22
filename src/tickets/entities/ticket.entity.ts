@@ -8,8 +8,8 @@ export class Ticket {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
-    number: number;
+    @Column({ nullable: true })
+    number?: number;
 
     @Column()
     subject: string;
@@ -20,30 +20,30 @@ export class Ticket {
     @UpdateDateColumn()
     updated_at: Date;
 
-    @Column()
-    due_date: Date;
+    @Column({ nullable: true })
+    due_date?: Date;
 
-    @Column()
-    start_date: Date;
+    @Column({ nullable: true })
+    start_date?: Date;
 
-    @Column()
-    end_date: Date;
+    @Column({ nullable: true })
+    end_date?: Date;
 
-    @Column()
-    resoved_date: Date;
+    @Column({ nullable: true })
+    resoved_date?: Date;
 
     @Column()
     status: string;
 
-    @ManyToOne(type => User, technician => technician.tickets)
-    technician: User;
+    @ManyToOne(type => User, technician => technician.tickets, { onDelete: 'SET NULL' })
+    technician?: User;
 
-    @ManyToOne(type => User, customer => customer.tickets)
+    @ManyToOne(type => User, customer => customer.tickets, { onDelete: 'SET NULL' })
     customer: User;
 
-    @ManyToOne(type => Priority, priority => priority.tickets)
-    priority: Priority;
+    @ManyToOne(type => Priority, priority => priority.tickets, { onDelete: 'SET NULL' })
+    priority?: Priority;
 
-    @OneToMany(type => Comment, comment => comment.ticket)
-    comments: Comment[];
+    @OneToMany(type => Comment, comment => comment.ticket, { onDelete: 'CASCADE' })
+    comments?: Comment[];
 }

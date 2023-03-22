@@ -23,15 +23,17 @@ export class AuthService {
     async login(user: User) {
         const payload = { email: user.email, sub: user.id };
         return {
-        user: { email: user.email, id: user.id, role: user.role.name },
-        access_token: this.jwtService.sign(payload),
+            user: { email: user.email, id: user.id, role: user.role?.name },
+            access_token: this.jwtService.sign(payload),
         };
     }
 
-    async register(userRegisterDto: UserRegisterDto) {
-        const user = await this.usersService.findOneValidate(userRegisterDto);
+    async register(userRegisterDto: UserRegisterDto) {      
+        const user = await this.usersService.findOneValidate(userRegisterDto);        
         if (user) throw new NotAcceptableException('User already exists');
 
-        this.usersService.register(userRegisterDto);
+        const registeredUser = await this.usersService.register(userRegisterDto);
+        
+        return this.login(registeredUser)
     }
 }

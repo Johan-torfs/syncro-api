@@ -26,6 +26,18 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @Get('/customers/all')
+  @Roles(['admin'])
+  findAllCustomers() {
+    return this.usersService.findAllByRole('customer');
+  }
+
+  @Get('/technicians/all')
+  @Roles(['admin'])
+  findAllTechnicians() {
+    return this.usersService.findAllByRole('technician');
+  }
+
   @Get(':id')
   @Roles(['admin'])
   findOne(@Param('id') id: string) {

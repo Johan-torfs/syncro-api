@@ -14,16 +14,22 @@ export class UsersService {
   constructor(@InjectRepository(User) private userRepository: Repository<User>, private rolesService: RolesService) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    if (!createUserDto.roleId) createUserDto.roleId = 1;
-
-    let role = await this.rolesService.findOne(createUserDto.roleId);
-    delete createUserDto.roleId; 
-
-    return this.register({...createUserDto, role: role});
+    return this.register(createUserDto);
   }
 
   async findAll(): Promise<User[]> {
     return this.userRepository.find({relations: ["role"]});
+  }
+
+  async findAllByRole(roleName: string): Promise<User[]> {
+    let role = await this.rolesService.findOneByName(roleName);
+
+    if (!role) return [];
+
+    return this.userRepository.find({
+      where: { role: role },
+      relations: ["role"]
+    });
   }
 
   async findOne(id: number): Promise<User> {
@@ -51,7 +57,12 @@ export class UsersService {
     const hashedPassword = await bcrypt.hash(userRegisterDto.password, saltOrRounds);
     userRegisterDto.password = hashedPassword;
 
-    return this.userRepository.save(userRegisterDto);
+    if (!userRegisterDto.roleId) userRegisterDto.roleId = 1;
+
+    let role = await this.rolesService.findOne(userRegisterDto.roleId);
+    delete userRegisterDto.roleId; 
+
+    return this.userRepository.save({...userRegisterDto, role: role});
   }
 
   async findOneValidate(userLoginDto: UserLoginDto): Promise<User> {

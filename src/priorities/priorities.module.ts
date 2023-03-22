@@ -8,6 +8,7 @@ import { UsersModule } from 'src/users/users.module';
 @Module({
   imports: [TypeOrmModule.forFeature([Priority]), UsersModule],
   controllers: [PrioritiesController],
-  providers: [PrioritiesService]
+  providers: [PrioritiesService],
+  exports: [PrioritiesService]
 })
 export class PrioritiesModule {}

@@ -12,6 +12,6 @@ export class Priority {
     @Column()
     color: string;
 
-    @OneToMany(type => Ticket, ticket => ticket.priority)
+    @OneToMany(type => Ticket, ticket => ticket.priority, { onDelete: 'SET NULL' })
     tickets: Ticket[];
 }

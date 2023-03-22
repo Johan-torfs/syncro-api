@@ -1,5 +1,5 @@
 export class CreateAssetDto {
     name: string;
-    customer_id: number;
+    customerId: number;
     asset_type: string;
 }
