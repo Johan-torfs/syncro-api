@@ -11,7 +11,10 @@ export class CommentsService {
   constructor (@InjectRepository(Comment) private commentRepository: Repository<Comment>, @Inject(forwardRef(() => TicketsService)) private ticketsService: TicketsService) {}
   
   async create(createCommentDto: CreateCommentDto): Promise<Comment> {
-    if (!createCommentDto.ticketId) throw new HttpException("ticketId is required", 400);
+    if (!createCommentDto.ticketId) 
+      throw new HttpException("ticketId is required", 400);
+    if (!(await this.ticketsService.isUserAllowed(createCommentDto.ticketId))) 
+      throw new HttpException("You are not allowed to comment on this ticket", 403);
 
     let ticket = await this.ticketsService.findOne(createCommentDto.ticketId);
     delete createCommentDto.ticketId;

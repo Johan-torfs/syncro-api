@@ -1,68 +1,55 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Inject, Injectable, Scope } from '@nestjs/common';
+import { REQUEST } from '@nestjs/core';
+import { Request } from 'express';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CommentsService } from 'src/comments/comments.service';
 import { PrioritiesService } from 'src/priorities/priorities.service';
 import { UsersService } from 'src/users/users.service';
-import { UpdateResult } from 'typeorm';
+import { IsNull, UpdateResult } from 'typeorm';
 import { Repository } from 'typeorm/repository/Repository';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
 import { Ticket } from './entities/ticket.entity';
+import { TicketRoleStrategyInterface } from './strategy/ticket-role.strategy';
+import { TicketRoleAdminStrategy } from './strategy/ticket-role-admin.strategy';
+import { TicketRoleTechnicianStrategy } from './strategy/ticket-role-technician.strategy';
+import { TicketRoleCustomerStrategy } from './strategy/ticket-role-customer.strategy';
 
-@Injectable()
+@Injectable({ scope: Scope.REQUEST })
 export class TicketsService {
-  constructor(@InjectRepository(Ticket) private ticketRepository: Repository<Ticket>, private usersService: UsersService, private prioritiesService: PrioritiesService, private commentsService: CommentsService) {}
+  constructor(@InjectRepository(Ticket) private ticketRepository: Repository<Ticket>, @Inject(REQUEST) private readonly request: Request, private usersService: UsersService, private prioritiesService: PrioritiesService, private commentsService: CommentsService) {}
+
+  async isUserAllowed(ticketId: number) : Promise<boolean> {
+    return (await this.getTicketRoleStrategy()).isUserAllowed(ticketId);
+  }
+
+  async getTicketRoleStrategy() : Promise<TicketRoleStrategyInterface> {
+    const user = await this.usersService.findOne(this.request.user["userId"]);
+    
+    switch (user.role.name) {
+      case "admin":
+        return new TicketRoleAdminStrategy(this.ticketRepository, this.usersService, this.commentsService, this.prioritiesService);
+      case "technician":
+        return new TicketRoleTechnicianStrategy(this.ticketRepository, this.usersService, this.commentsService, this.prioritiesService, user);
+      default:
+        return new TicketRoleCustomerStrategy(this.ticketRepository, this.commentsService, this.prioritiesService, user);
+    }
+  }
 
   async create(createTicketDto: CreateTicketDto): Promise<Ticket> {
-    if (!createTicketDto.customerId) throw new HttpException("customerId is required", 400);
-
-    let customer = await this.usersService.findOne(createTicketDto.customerId);
-    delete createTicketDto.customerId;
-
-
-    let technician = null;
-    if (createTicketDto.technicianId) {
-      technician = await this.usersService.findOne(createTicketDto.technicianId);
-      delete createTicketDto.technicianId; 
-    }
-
-    let priority = null;
-    if (createTicketDto.priorityId) {
-      priority = await this.prioritiesService.findOne(createTicketDto.priorityId);
-      delete createTicketDto.priorityId;
-    }
-
-    let ticket =  await this.ticketRepository.save({ ...createTicketDto, customer: customer, technician: technician, priority: priority, status: "New" });
-
-    if (createTicketDto.comment) this.commentsService.create({ticketId: ticket.id, body: createTicketDto.comment});
-    return ticket;
+    return (await this.getTicketRoleStrategy()).create(createTicketDto);
   }
 
   async findAll(): Promise<Ticket[]> {
-    return this.ticketRepository.find({ relations: ["customer", "technician", "priority"] });
+    return (await this.getTicketRoleStrategy()).findAll();
   }
 
   async findOne(id: number): Promise<Ticket> {
-    return this.ticketRepository.findOne({ where: { id: id }, relations: ["customer", "technician", "priority", "comments"] });
+    return (await this.getTicketRoleStrategy()).findOne(id);
   }
 
   async update(id: number, updateTicketDto: UpdateTicketDto): Promise<UpdateResult> {
-    let ticket = {customer: null, technician: null, priority: null};
-    
-    if (updateTicketDto.customerId) ticket.customer = await this.usersService.findOne(updateTicketDto.customerId);
-    delete updateTicketDto.customerId;
-
-    if (updateTicketDto.technicianId) ticket.technician = await this.usersService.findOne(updateTicketDto.technicianId);
-    delete updateTicketDto.technicianId;
-
-    if (updateTicketDto.priorityId) ticket.priority = await this.prioritiesService.findOne(updateTicketDto.priorityId);
-    delete updateTicketDto.priorityId;
-
-    if (!ticket.customer) delete ticket.customer;
-    if (!ticket.technician) delete ticket.technician;
-    if (!ticket.priority) delete ticket.priority;
-
-    return this.ticketRepository.update(id, {...updateTicketDto, ...ticket});
+    return (await this.getTicketRoleStrategy()).update(id, updateTicketDto);
   }
 
   async remove(id: number): Promise<void> {

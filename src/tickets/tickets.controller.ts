@@ -15,25 +15,21 @@ export class TicketsController {
   constructor(private readonly ticketsService: TicketsService) {}
 
   @Post()
-  @Roles(['admin'])
   create(@Body() createTicketDto: CreateTicketDto) {
     return this.ticketsService.create(createTicketDto);
   }
 
   @Get()
-  @Roles(['admin'])
   findAll() {
     return this.ticketsService.findAll();
   }
 
   @Get(':id')
-  @Roles(['admin'])
   findOne(@Param('id') id: string) {
     return this.ticketsService.findOne(+id);
   }
 
   @Patch(':id')
-  @Roles(['admin'])
   update(@Param('id') id: string, @Body() updateTicketDto: UpdateTicketDto) {
     return this.ticketsService.update(+id, updateTicketDto);
   }

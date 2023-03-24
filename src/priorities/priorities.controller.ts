@@ -21,13 +21,11 @@ export class PrioritiesController {
   }
 
   @Get()
-  @Roles(['admin'])
   findAll() {
     return this.prioritiesService.findAll();
   }
 
   @Get(':id')
-  @Roles(['admin'])
   findOne(@Param('id') id: string) {
     return this.prioritiesService.findOne(+id);
   }

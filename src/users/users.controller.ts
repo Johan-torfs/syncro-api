@@ -21,25 +21,19 @@ export class UsersController {
   }
 
   @Get()
-  @Roles(['admin'])
+  @Roles(['admin', 'technician'])
   findAll() {
     return this.usersService.findAll();
   }
 
-  @Get('/customers/all')
-  @Roles(['admin'])
-  findAllCustomers() {
-    return this.usersService.findAllByRole('customer');
-  }
-
-  @Get('/technicians/all')
-  @Roles(['admin'])
-  findAllTechnicians() {
-    return this.usersService.findAllByRole('technician');
+  @Get('all/:role')
+  @Roles(['admin', 'technician'])
+  findAllByRole(@Param('role') role: string) {
+    return this.usersService.findAllByRole(role);
   }
 
   @Get(':id')
-  @Roles(['admin'])
+  @Roles(['admin', 'technician'])
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(+id);
   }

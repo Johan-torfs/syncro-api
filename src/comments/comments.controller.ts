@@ -15,7 +15,6 @@ export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
   @Post()
-  @Roles(['admin'])
   create(@Body() createCommentDto: CreateCommentDto) {
     return this.commentsService.create(createCommentDto);
   }

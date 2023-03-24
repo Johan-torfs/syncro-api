@@ -22,12 +22,8 @@ export class UsersService {
   }
 
   async findAllByRole(roleName: string): Promise<User[]> {
-    let role = await this.rolesService.findOneByName(roleName);
-
-    if (!role) return [];
-
     return this.userRepository.find({
-      where: { role: role },
+      where: { role: {name: roleName} },
       relations: ["role"]
     });
   }
