@@ -30,7 +30,7 @@ export class Ticket {
     end_date?: Date;
 
     @Column({ nullable: true })
-    resoved_date?: Date;
+    resolved_date?: Date;
 
     @Column()
     status: string;

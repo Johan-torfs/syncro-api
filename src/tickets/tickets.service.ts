@@ -14,6 +14,7 @@ import { TicketRoleStrategyInterface } from './strategy/ticket-role.strategy';
 import { TicketRoleAdminStrategy } from './strategy/ticket-role-admin.strategy';
 import { TicketRoleTechnicianStrategy } from './strategy/ticket-role-technician.strategy';
 import { TicketRoleCustomerStrategy } from './strategy/ticket-role-customer.strategy';
+import { UpdateStatusDto } from './dto/update-status.dto';
 
 @Injectable({ scope: Scope.REQUEST })
 export class TicketsService {
@@ -44,6 +45,12 @@ export class TicketsService {
     return (await this.getTicketRoleStrategy()).findAll();
   }
 
+  async findAllFromDate(date: string): Promise<Ticket[]> {
+    let dateObj = new Date(+date.slice(0, 4), +date.slice(4, 6) - 1, +date.slice(6, 8) + 1);  
+    
+    return (await this.getTicketRoleStrategy()).findAllFromDate(dateObj);
+  }
+
   async findOne(id: number): Promise<Ticket> {
     return (await this.getTicketRoleStrategy()).findOne(id);
   }
@@ -54,5 +61,12 @@ export class TicketsService {
 
   async remove(id: number): Promise<void> {
     await this.ticketRepository.delete(id);
+  }
+
+  async updateStatus(id: number, statusDto: UpdateStatusDto): Promise<UpdateResult> {
+    console.log(statusDto);
+    
+    if (!statusDto.status) throw new HttpException("status is required", 400);
+    return (await this.getTicketRoleStrategy()).updateStatus(id, statusDto);
   }
 }

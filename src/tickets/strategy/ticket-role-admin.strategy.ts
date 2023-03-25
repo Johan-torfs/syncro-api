@@ -3,8 +3,9 @@ import { CommentsService } from "src/comments/comments.service";
 import { PrioritiesService } from "src/priorities/priorities.service";
 import { User } from "src/users/entities/user.entity";
 import { UsersService } from "src/users/users.service";
-import { Repository, UpdateResult } from "typeorm";
+import { MoreThanOrEqual, Repository, UpdateResult } from "typeorm";
 import { CreateTicketDto } from "../dto/create-ticket.dto";
+import { UpdateStatusDto } from "../dto/update-status.dto";
 import { UpdateTicketDto } from "../dto/update-ticket.dto";
 import { Ticket } from "../entities/ticket.entity";
 import { TicketRoleStrategyInterface } from "./ticket-role.strategy";
@@ -53,6 +54,14 @@ export class TicketRoleAdminStrategy implements TicketRoleStrategyInterface {
         });
     }
 
+    async findAllFromDate(date: Date): Promise<Ticket[]> {
+        return this.ticketRepository.find({ 
+            where: { created_at: MoreThanOrEqual(date) },
+            relations: ["customer", "technician", "priority"], 
+            order: {created_at: "DESC"} 
+        });
+    }
+
     async findOne(id: number): Promise<Ticket> {
         return this.ticketRepository.findOne({ 
             where: { id: id },
@@ -81,6 +90,12 @@ export class TicketRoleAdminStrategy implements TicketRoleStrategyInterface {
 
     async remove(id: number): Promise<void> {
         await this.ticketRepository.delete(id);
+    }
+
+    async updateStatus(id: number, statusDto: UpdateStatusDto): Promise<UpdateResult> {
+        if (statusDto.status.toLocaleLowerCase() == "resolved") 
+            return await this.ticketRepository.update(id, { status: statusDto.status, resolved_date: new Date() });
+        return await this.ticketRepository.update(id, { status: statusDto.status });
     }
     
 }
