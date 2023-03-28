@@ -64,8 +64,6 @@ export class TicketsService {
   }
 
   async updateStatus(id: number, statusDto: UpdateStatusDto): Promise<UpdateResult> {
-    console.log(statusDto);
-    
     if (!statusDto.status) throw new HttpException("status is required", 400);
     return (await this.getTicketRoleStrategy()).updateStatus(id, statusDto);
   }
